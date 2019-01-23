@@ -1,0 +1,46 @@
+server:
+  active: default
+  port: 8000
+  error:
+    whitelabel:
+      enabled: false
+debug: true
+spring:
+  profiles: default
+  jpa:
+    database: MYSQL
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    generate-ddl: true
+  datasource:
+    platform: mysql
+    url: jdbc:mysql://${DB_HOST}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driverClassName: com.mysql.jdbc.Driver
+    initialization-mode: always
+jwt:
+  header: Authorization
+  secret: invillia
+  expiration: 1000000000 #1 ano
+---
+spring:
+  profiles: test
+  jpa:
+    database: MYSQL
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    generate-ddl: true
+  datasource:
+    platform: mysql
+    url: jdbc:mysql://${DB_HOST}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driverClassName: com.mysql.jdbc.Driver
+    initialization-mode: always
+jwt:
+  header: Authorization
+  secret: invillia
+  expiration: 1000000000 #1 ano
