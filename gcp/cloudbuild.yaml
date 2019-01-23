@@ -1,0 +1,17 @@
+steps:
+- id: 'build apiinvillia image'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA', '-f','./Dockerfile', '.']]
+- id: 'push apiinvillia image'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA']
+- id: 'set apiinvillia image in yamls'
+  name: 'ubuntu'
+  args: ['bash','-c','sed -i "s,API_ERP_IMAGE_NAME,gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA," ./gcp/*.yml']
+- id: kubectl-apply
+  name: 'gcr.io/cloud-builders/kubectl'
+  args: ['apply', '-f', 'api-deployment.yml']
+  env:
+  - 'CLOUDSDK_COMPUTE_ZONE=us-central1-c'
+  - 'CLOUDSDK_CONTAINER_CLUSTER=production-cluster'
+images: ['gcr.io/$PROJECT_ID/$REPO_NAME:$SHORT_SHA']

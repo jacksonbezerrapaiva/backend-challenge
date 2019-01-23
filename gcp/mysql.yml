@@ -1,0 +1,48 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+    name: cloudsql
+spec:
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: 0
+        maxSurge: 1
+    replicas: 1
+    template:
+        metadata:
+            labels:
+                app: cloudsql
+        spec:
+            containers:
+                - name: cloudsql
+                  image: gcr.io/cloudsql-docker/gce-proxy:1.11
+                  command: ["/cloud_sql_proxy", "-instances=xxxxx:us-central1:invillia=tcp:0.0.0.0:3306","-credential_file=/secrets/cloudsql/credentials.json"]
+                  securityContext:
+                    runAsUser: 2
+                    allowPrivilegeEscalation: false
+                  volumeMounts:
+                    - name: cloudsql-instance-credentials
+                      mountPath: /secrets/cloudsql
+                      readOnly: true
+                  ports:
+                    - containerPort: 3306
+                      name: sql
+            volumes:
+              - name: cloudsql-instance-credentials
+                secret:
+                  secretName: cloudsql-instance-credentials
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudsql
+spec:
+  type: ClusterIP
+  selector:
+    app: cloudsql
+  ports:
+    - port: 3306
+      name: sql
+      targetPort: sql
